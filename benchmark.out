@@ -1,0 +1,76 @@
+Running benchmarks...
+======================================
+benchmark_flexql
+======================================
+Connected to FlexQL server
+Running SQL subset checks plus multi-client insert/select/where benchmarks...
+Target insert rows: 10000000
+Client count: 1
+
+[PASS] CREATE TABLE BIG_USERS (0 ms)
+[PASS] DELETE BIG_USERS (13 ms)
+
+Starting multi-client insertion benchmark for 10000000 rows across 1 clients...
+Insert progress: 10% (1000000/10000000 rows)
+Insert progress: 20% (2000000/10000000 rows)
+Insert progress: 30% (3000000/10000000 rows)
+Insert progress: 40% (4000000/10000000 rows)
+Insert progress: 50% (5000000/10000000 rows)
+Insert progress: 60% (6000000/10000000 rows)
+Insert progress: 70% (7000000/10000000 rows)
+Insert progress: 80% (8000000/10000000 rows)
+Insert progress: 90% (9000000/10000000 rows)
+Insert progress: 100% (10000000/10000000 rows)
+[PASS] Multi-client INSERT benchmark complete
+Rows inserted: 10000000
+Elapsed: 34265 ms
+Throughput: 291842 rows/sec
+
+Starting multi-client SELECT benchmarks...
+[PASS] Multi-client SELECT benchmark (full table scan) | clients=1 | total_rows=10000000 | elapsed=2536 ms
+[PASS] Multi-client WHERE benchmark (primary key equality) | clients=1 | total_rows=1 | elapsed=0 ms
+
+[[...Running Unit Tests...]]
+
+[PASS] CREATE TABLE TEST_USERS (0 ms)
+[PASS] DELETE TEST_USERS (0 ms)
+[PASS] INSERT TEST_USERS ID=1 (42 ms)
+[PASS] INSERT TEST_USERS ID=2 (21 ms)
+[PASS] INSERT TEST_USERS ID=3 (14 ms)
+[PASS] INSERT TEST_USERS ID=4 (14 ms)
+[PASS] Basic SELECT * validation
+[PASS] Single-row value validation
+[PASS] Filtered rows validation
+[PASS] Empty result-set validation
+[PASS] CREATE TABLE TEST_ORDERS (0 ms)
+[PASS] DELETE TEST_ORDERS (0 ms)
+[PASS] INSERT TEST_ORDERS ORDER_ID=101 (14 ms)
+[PASS] INSERT TEST_ORDERS ORDER_ID=102 (14 ms)
+[PASS] INSERT TEST_ORDERS ORDER_ID=103 (14 ms)
+[PASS] Join with no matches validation
+[PASS] Invalid SQL should fail
+[PASS] Missing table should fail
+
+Unit Test Summary: 23/23 passed, 0 failed.
+
+
+======================================
+benchmark_after_insert
+======================================
+Running Post-Insert Query Benchmarks...
+Assuming table 'BIG_USERS' contains 100000 rows.
+Client count: 1
+
+[PASS] Full Table Select | clients=1 | total_rows=10000000 | elapsed=3180 ms
+[PASS] Primary Index Lookup (ID = X) | clients=1 | total_rows=1 | elapsed=0 ms
+[PASS] Inequality Check (ID != 1) | clients=1 | total_rows=9999999 | elapsed=3751 ms
+[PASS] Greater Than (ID > X) | clients=1 | total_rows=9999999 | elapsed=3604 ms
+[PASS] Less Than (ID < X) | clients=1 | total_rows=0 | elapsed=2748 ms
+[PASS] Greater Than Eq (ID >= X) | clients=1 | total_rows=10000000 | elapsed=3468 ms
+[PASS] Less Than Eq (ID <= X) | clients=1 | total_rows=1 | elapsed=2741 ms
+[PASS] Non-Index Column Match (BALANCE = 1500) | clients=1 | total_rows=1000 | elapsed=2995 ms
+[PASS] Non-Index Col Greater (BALANCE > 9000) | clients=1 | total_rows=1999000 | elapsed=3178 ms
+[PASS] String Exact Match (EMAIL = 'user1@mail.com') | clients=1 | total_rows=1 | elapsed=2357 ms
+[PASS] String Inequality (NAME != 'user1') | clients=1 | total_rows=9999999 | elapsed=3090 ms
+
+All benchmarks completed successfully!
