@@ -28,13 +28,24 @@
     showstringspaces=false,
 }
 
-\title{\textbf{FlexQL Database Engine}\\\Large Detailed Design and Architecture Document}
-\author{Development Team}
+\title{\textbf{FlexQL Database Engine}\\[0.4em]\Large Detailed Design and Architecture Document}
+\author{}
 \date{\today}
 
 \begin{document}
 
 \maketitle
+
+\vspace{-1.2em}
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{rl}
+\textbf{Name:} & \textbf{Nilesh Gupta} \\
+\textbf{Roll No.:} & 25CS60R64 \\
+\textbf{GitHub Repository:} & \href{https://github.com/Nilesh0711/FLEXQL}{github.com/Nilesh0711/FLEXQL} \\
+\end{tabular}
+\end{center}
+\vspace{0.6em}
 
 \begin{spacing}{1.08}
 
@@ -144,76 +155,13 @@ Figure~\ref{fig:system-architecture} is intended to hold the rendered Mermaid ar
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{diagrams/system_architecture.png}
+    \includegraphics[width=0.8\textwidth]{diagrams/system_architecture.png}
     \caption{High-level FlexQL architecture showing client access, server runtime, parser, executor, and persistence subsystems.}
     \label{fig:system-architecture}
 \end{figure}
 
 For convenience, the Mermaid source that matches this section is:
 
-\begin{lstlisting}
-%%{init: {'theme': 'base', 'themeVariables': {
-%%  'primaryColor': '#f4efe6',
-%%  'primaryTextColor': '#1f2933',
-%%  'primaryBorderColor': '#8a6f4d',
-%%  'lineColor': '#5b6570',
-%%  'secondaryColor': '#e6f0ea',
-%%  'tertiaryColor': '#e8eef7'
-%%}}}%%
-flowchart TD
-    subgraph Clients
-        A[Client App]
-        B[REPL]
-        C[Tests and Benchmarks]
-    end
-
-    subgraph Access
-        D[libflexql Client API]
-        E[FlexQL TCP Server]
-    end
-
-    subgraph QueryCore
-        F[Parser]
-        G[Executor]
-    end
-
-    subgraph RuntimeServices
-        H[Storage Manager]
-        I[Query Cache]
-        J[WAL]
-    end
-
-    subgraph DiskLayout
-        K[Table Metadata<br/>data/tables/*.meta]
-        L[Row Files<br/>data/tables/*.rows]
-        M[Index Files<br/>data/indexes/*.idx]
-    end
-
-    A --> D
-    B --> D
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    G --> I
-    G --> J
-    H --> K
-    H --> L
-    H --> M
-
-    classDef clients fill:#fdecc8,stroke:#c08b2c,color:#2b2112,stroke-width:1.5px;
-    classDef access fill:#dbeafe,stroke:#3b82f6,color:#122033,stroke-width:1.5px;
-    classDef core fill:#e9d5ff,stroke:#8b5cf6,color:#24123a,stroke-width:1.5px;
-    classDef runtime fill:#dcfce7,stroke:#22c55e,color:#163221,stroke-width:1.5px;
-    classDef disk fill:#ffe4e6,stroke:#e11d48,color:#3a1420,stroke-width:1.5px;
-
-    class A,B,C clients;
-    class D,E access;
-    class F,G core;
-    class H,I,J runtime;
-    class K,L,M disk;
-\end{lstlisting}
 
 \subsection{Runtime Components}
 
@@ -240,57 +188,10 @@ Figure~\ref{fig:request-lifecycle} is intended to hold the rendered Mermaid requ
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{diagrams/request_lifecycle.png}
+    \includegraphics[width=0.5\textwidth]{diagrams/request_lifecycle.png}
     \caption{End-to-end request lifecycle from client SQL submission to streamed results.}
     \label{fig:request-lifecycle}
 \end{figure}
-
-The Mermaid source for this flow is:
-
-\begin{lstlisting}
-%%{init: {'theme': 'base', 'themeVariables': {
-%%  'primaryColor': '#f8fafc',
-%%  'primaryTextColor': '#1f2937',
-%%  'primaryBorderColor': '#64748b',
-%%  'lineColor': '#475569'
-%%}}}%%
-flowchart TD
-    A[Client issues SQL] --> B[Send length-prefixed SQL]
-    B --> C[Worker thread receives request]
-    C --> D{Statement type}
-    D -->|SELECT| E[Acquire read lock]
-    D -->|CREATE / INSERT / DELETE / RESET| F[Acquire write lock]
-    E --> G[Parse SQL]
-    F --> G
-    G --> H[Executor dispatch]
-
-    H --> I{Execution path}
-    I -->|Read path| J[Check query cache]
-    J --> K{Cache hit?}
-    K -->|Yes| L[Replay cached rows]
-    K -->|No| M[Run scan, index lookup, or join]
-
-    I -->|Write path| N[Append SQL to WAL]
-    N --> O[Execute storage and index update]
-    O --> P[Invalidate cache]
-    P --> Q[Clear WAL]
-
-    L --> R[Stream results to callback]
-    M --> R
-    Q --> R
-
-    classDef client fill:#fdecc8,stroke:#c08b2c,color:#2b2112,stroke-width:1.5px;
-    classDef control fill:#dbeafe,stroke:#2563eb,color:#10243e,stroke-width:1.5px;
-    classDef readpath fill:#dcfce7,stroke:#16a34a,color:#163221,stroke-width:1.5px;
-    classDef writepath fill:#ffe4e6,stroke:#e11d48,color:#3a1420,stroke-width:1.5px;
-    classDef decision fill:#ede9fe,stroke:#7c3aed,color:#24123a,stroke-width:1.5px;
-
-    class A,B,C client;
-    class E,F,G,H,R control;
-    class J,K,L,M readpath;
-    class N,O,P,Q writepath;
-    class D,I decision;
-\end{lstlisting}
 
 \subsection{Client/Server Protocol}
 
@@ -613,42 +514,10 @@ Figure~\ref{fig:index-structure} is intended to hold the rendered Mermaid index-
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{diagrams/index_structure.png}
+    \includegraphics[width=0.5\textwidth]{diagrams/index_structure.png}
     \caption{Conceptual primary-key B+ tree layout used by FlexQL index files.}
     \label{fig:index-structure}
 \end{figure}
-
-The Mermaid source for this diagram is:
-
-\begin{lstlisting}
-%%{init: {'theme': 'base', 'themeVariables': {
-%%  'primaryColor': '#f8fafc',
-%%  'primaryTextColor': '#1f2937',
-%%  'primaryBorderColor': '#64748b',
-%%  'lineColor': '#475569'
-%%}}}%%
-flowchart TD
-    R[Root / Internal Page<br/>keys: 100, 250]
-
-    subgraph LeafLevel
-        direction TB
-        L1[Leaf Page A<br/>keys: 1..99<br/>row offsets]
-        L2[Leaf Page B<br/>keys: 100..249<br/>row offsets]
-        L3[Leaf Page C<br/>keys: 250+<br/>row offsets]
-    end
-
-    R --> L1
-    R --> L2
-    R --> L3
-    L1 -. next leaf .-> L2
-    L2 -. next leaf .-> L3
-
-    classDef root fill:#ddd6fe,stroke:#7c3aed,color:#24123a,stroke-width:1.5px;
-    classDef leaf fill:#dcfce7,stroke:#16a34a,color:#163221,stroke-width:1.5px;
-
-    class R root;
-    class L1,L2,L3 leaf;
-\end{lstlisting}
 
 \section{Caching Strategy}
 
@@ -739,42 +608,10 @@ Figure~\ref{fig:wal-recovery} is intended to hold the rendered Mermaid WAL recov
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.92\textwidth]{diagrams/wal_recovery.png}
+    \includegraphics[width=0.3\textwidth]{diagrams/wal_recovery.png}
     \caption{Startup recovery flow using the write-ahead log.}
     \label{fig:wal-recovery}
 \end{figure}
-
-The Mermaid source for this flow is:
-
-\begin{lstlisting}
-%%{init: {'theme': 'base', 'themeVariables': {
-%%  'primaryColor': '#f8fafc',
-%%  'primaryTextColor': '#1f2937',
-%%  'primaryBorderColor': '#64748b',
-%%  'lineColor': '#475569'
-%%}}}%%
-flowchart TD
-    A[Server start] --> B[Initialize storage catalog and cache]
-    B --> C[Open data/wal/flexql.wal]
-    C --> D{WAL empty?}
-    D -->|Yes| E[Continue startup]
-    D -->|No| F[Read next SQL record]
-    F --> G[Re-execute statement]
-    G --> H{More WAL records?}
-    H -->|Yes| F
-    H -->|No| I[Clear WAL]
-    I --> E
-
-    classDef startup fill:#dbeafe,stroke:#2563eb,color:#10243e,stroke-width:1.5px;
-    classDef wal fill:#ffe4e6,stroke:#e11d48,color:#3a1420,stroke-width:1.5px;
-    classDef decision fill:#ede9fe,stroke:#7c3aed,color:#24123a,stroke-width:1.5px;
-    classDef done fill:#dcfce7,stroke:#16a34a,color:#163221,stroke-width:1.5px;
-
-    class A,B startup;
-    class C,F,G,I wal;
-    class D,H decision;
-    class E done;
-\end{lstlisting}
 
 \section{Concurrency Model}
 
@@ -823,60 +660,6 @@ Figure~\ref{fig:concurrency-model} is intended to hold the rendered Mermaid conc
     \caption{Thread-per-connection server model with shared read access and serialized writes.}
     \label{fig:concurrency-model}
 \end{figure}
-
-The Mermaid source for this diagram is:
-
-\begin{lstlisting}
-%%{init: {'theme': 'base', 'themeVariables': {
-%%  'primaryColor': '#f8fafc',
-%%  'primaryTextColor': '#1f2937',
-%%  'primaryBorderColor': '#64748b',
-%%  'lineColor': '#475569'
-%%}}}%%
-flowchart TD
-    subgraph Clients
-        A[Client A]
-        B[Client B]
-        C[Client C]
-    end
-
-    subgraph WorkerLayer
-        TA[Worker Thread A]
-        TB[Worker Thread B]
-        TC[Worker Thread C]
-    end
-
-    subgraph LockLayer
-        R[Shared Read Lock]
-        W[Exclusive Write Lock]
-    end
-
-    subgraph Operations
-        S[SELECT]
-        M[CREATE / INSERT / DELETE / RESET]
-    end
-
-    A --> TA
-    B --> TB
-    C --> TC
-    TA --> R
-    TB --> R
-    TC --> W
-    R --> S
-    W --> M
-
-    classDef clients fill:#fdecc8,stroke:#c08b2c,color:#2b2112,stroke-width:1.5px;
-    classDef workers fill:#dbeafe,stroke:#2563eb,color:#10243e,stroke-width:1.5px;
-    classDef locks fill:#ede9fe,stroke:#7c3aed,color:#24123a,stroke-width:1.5px;
-    classDef ops fill:#dcfce7,stroke:#16a34a,color:#163221,stroke-width:1.5px;
-    classDef writes fill:#ffe4e6,stroke:#e11d48,color:#3a1420,stroke-width:1.5px;
-
-    class A,B,C clients;
-    class TA,TB,TC workers;
-    class R,W locks;
-    class S ops;
-    class M writes;
-\end{lstlisting}
 
 \section{Server and Client API}
 
